@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mapper.TestQuestionMapper">
+<select id="getQuestionBySelected" parameterType="Map" resultType="Question">
+select Q.id,Q.question,Q.artid,Q.answer,Q.type,Q.selected_1,Q.selected_2,Q.selected_3,Q.selected_4
+from question Q,articleinfo A
+<where>
+Q.artid=A.id 
+<if test="dynasty != null">and A.dynasty=#{dynasty}</if>
+<if test="dynasty == null and type!=null"> and A.type=#{type}</if>
+</where>  
+ORDER BY RAND() LIMIT 0,10
+</select>
+<insert id="addQuestionByManage" parameterType="Question">
+insert into question(question,artid,answer,type,selected_1,selected_2,selected_3,selected_4)
+value(#{question},#{artid},#{answer},#{type},#{selected_1},#{selected_2},#{selected_3},#{selected_4})
+</insert>
+</mapper>

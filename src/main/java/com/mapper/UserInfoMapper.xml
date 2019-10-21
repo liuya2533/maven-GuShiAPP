@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mapper.UserInfoMapper">
+<select id="checkUserLogin" parameterType="UserInfo" resultType="UserInfo">
+select * 
+from userinfo 
+where email=#{email} and password=#{password}
+</select>
+<insert id="userRegister" parameterType="UserInfo">
+insert userinfo(email,username,password,sex,age,power,edulevel,grade)
+value(#{email},#{username},#{password},#{sex},#{age},#{power},#{edulevel},#{grade})
+</insert>
+<update id="updateUserInfo" parameterType="UserInfo">
+update userinfo
+set email=#{email},username=#{username},password=#{password},sex=#{sex},age=#{age},
+power=#{power},edulevel=#{edulevel},grade=#{grade},operation_record=#{operation_record}
+where id=#{id}
+</update>
+<insert id="addAuthorInfo" parameterType="AuthorInfo">
+insert into authorinfo(name,dynasty,introduce)
+value(#{name},#{dynasty},#{introduce})
+</insert>
+<select id="getAuthorInfo" parameterType="AuthorInfo" resultType="AuthorInfo">
+select * from authorinfo
+where name=#{name} and dynasty=#{dynasty}
+</select>
+<select id="checkUserEmail" parameterType="String" resultType="int">
+select count(*)
+from userinfo
+where email=#{email}
+</select>
+<insert id="addtapefile" parameterType="TapeFile">
+insert into tapefile(userid,artid,voice_name,tape_time)
+value(#{userid},#{artid},#{voice_name},#{tape_time})
+</insert>
+<delete id="deleteTape" parameterType="TapeFile">
+delete from tapefile 
+where id=#{id}
+</delete>
+<select id="getTapeFile" parameterType="int" resultType="TapeFile" >
+select *
+from tapefile
+where userid=#{userid}
+</select>
+</mapper>

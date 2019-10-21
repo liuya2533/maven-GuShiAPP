@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mapper.ArticleInfoMapper">
+<select id="articleDetails" parameterType="int" resultType="ArticleInfo">
+select A.*,B.introduce 
+from articleinfo A
+LEFT JOIN authorinfo B
+ON  A.author_info=B.id
+where  A.id=#{articleId}
+</select>
+<select id="recommendArt" resultType="ArticleInfo">
+select title,A.*
+from articleinfo A
+LEFT JOIN classifytable C
+ON A.id=C.artid
+<if test="_parameter != null">
+where title IN
+<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+         #{item}
+</foreach>
+or author IN
+<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+         #{item}
+</foreach>
+or C.classify_name IN
+<foreach item="item" index="index" collection="array" open="(" separator="," close=")">
+         #{item}
+</foreach>
+GROUP BY title
+ORDER BY author
+</if>
+<if test="_parameter == null">
+GROUP BY title
+ORDER BY RAND() LIMIT 0,10
+</if>
+</select>
+<insert id="addCollect" parameterType="Collection">
+insert collection(artid,userid) value(#{artid},#{userid})
+</insert>
+<delete id="removeCollect" parameterType="Collection">
+delete  from  collection WHERE artid=#{artid} and userid=#{userid};
+</delete>
+<select id="getMyCollect" parameterType="int" resultType="ArticleInfo">
+select a.id,a.title,a.author
+from collection c,articleinfo a
+where userid=#{userid} and c.artid=a.id
+</select>
+<select id="getSelectType" parameterType="String" resultType="ArticleInfo">
+select * 
+from articleinfo
+where type=#{type} 
+</select>
+<select id="getArtByStyle" parameterType="ArticleInfo" resultType="ArticleInfo">
+select *
+from articleinfo
+where  type=#{type} and style=#{style}
+</select>
+
+<select id="getArtBySearch" parameterType="ArticleInfo" resultType="ArticleInfo">
+select *
+from articleinfo
+<where>
+
+    <if test="title != null">
+        AND title like #{title}
+    </if>
+    <if test="author != null">
+        AND author like #{author}
+    </if>
+    <if test="content != null">
+        AND content like #{content}
+    </if>
+  </where>
+</select>
+<!-- where 元素只会在至少有一个子元素的条件返回 SQL 子句的情况下才去插入“WHERE”子句。而且，若语句的开头为“AND”或“OR”，where 元素也会将它们去除。 -->
+<select id="getArtForRhesis"  resultType="ArticleInfo">
+select * 
+from articleinfo
+where rhesis is not null
+</select>
+<select id="checkArtByTitleAndAuther" resultType="ArticleInfo" parameterType="ArticleInfo">
+select *
+from articleinfo
+where title=#{title} and author=#{author}
+</select>
+<insert id="addArticleByManage" parameterType="ArticleInfo">
+insert articleinfo(title,author,content,dynasty,type,style,annotation,translation,enjoytext,rhesis,poem_book,author_info)
+value(#{title},#{author},#{content},#{dynasty},#{type},#{style},#{annotation},#{translation},#{enjoytext},#{rhesis},#{poem_book},#{author_info})
+</insert>
+<select id="getAuthorByClassfiy" resultType="String" >
+select DISTINCT(author)
+from articleinfo
+order by author ASC 
+</select>
+<select id="getDynastyByClassfiy" resultType="String" >
+select DISTINCT(dynasty)
+from articleinfo
+</select>
+<select id="getClassifyByClassfiy" resultType="String" >
+select DISTINCT(classify_name)
+from classifytable
+</select>
+<select id="getPoembookByClassfiy" resultType="String" >
+select DISTINCT(poem_book)
+from articleinfo
+where poem_book is not null and poem_book!=""
+</select>
+<select id="getArtByClassify" resultType="ArticleInfo" parameterType="Map">
+select title,A.*
+from articleinfo A
+left JOIN classifytable C
+on A.id=C.artid
+where
+<if test="classify == '作者'">
+        author=#{classify_name}
+</if>
+<if test="classify == '朝代'">
+       dynasty=#{classify_name}
+</if>
+<if test="classify == '类型'">
+      classify_name=#{classify_name}
+</if>
+<if test="classify == '诗集'">
+       poem_book=#{classify_name} and poem_book is not null
+</if>
+GROUP BY A.title
+</select>
+<insert id="addClassify" parameterType="java.util.ArrayList">
+insert into classifytable(artid,classify_name)
+values
+<!--item就是List里每一项的对象名，要用","分割每一条数据，最后要";"结尾-->
+    <foreach collection="list" item="item" index="index" separator="," close=";">
+      (#{item.artid}, #{item.classify_name})
+    </foreach>
+</insert>
+<update id="updateArticle" parameterType="ArticleInfo">
+update articleinfo
+set poem_book=#{poem_book},author_info=#{author_info}
+where id=#{id}
+</update>
+<select id="getClassifyInfoByArtID" parameterType="int" resultType="ClassifyInfo">
+select *
+from classifytable
+where artid=#{artid}
+</select>
+</mapper>
