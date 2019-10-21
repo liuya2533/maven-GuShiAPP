@@ -3,5 +3,5 @@
 
 ##利用javaweb作为后台
 
-##HTML++CSS+JavaScript作为前台
+##HTML++CSS+JavaScript作为前台的一个javawebApp
 
